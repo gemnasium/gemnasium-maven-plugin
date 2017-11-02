@@ -32,8 +32,15 @@ public class Config {
      *  - properties file (gemnasium.properties)
      *  - plugin configuration (within pom.xml)
      *  - env variables
+     * @param baseDir The maven project baseDir.
+     * @param baseUrl The base URL of the Gemnasium instance (for Gemnasium Enteprise usage).
+     * @param apiKey Your Gemanisum API key
+     * @param projectBranch Current branch
+     * @param projectSlug The project identifier on Gemnasium.
+     * @param projectRevision Current revision
+     * @param ignoredScopes Comma separated list of Maven dependency scopes to ignore.
+     * @throws MojoExecutionException if properties configuration can't be loaded.
      */
-
     public Config(File baseDir, String baseUrl, String apiKey, String projectBranch, String projectSlug,
             String projectRevision, String ignoredScopes) throws MojoExecutionException {
         this.baseDir = baseDir;

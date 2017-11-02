@@ -51,6 +51,7 @@ public abstract class AbstractMainMojo extends AbstractMojo {
 
     /**
      * Loads configuration
+     * @throws MojoExecutionException if config can't be loaded
      */
     protected void loadConfig() throws MojoExecutionException {
         this.config = new Config(baseDir, baseUrl, apiKey, projectBranch, projectSlug, projectRevision,
@@ -58,7 +59,7 @@ public abstract class AbstractMainMojo extends AbstractMojo {
     }
 
     /**
-    * Print a header
+    * Prints a header
     */
     protected void printHeader() {
         getLog().info("Gemnasium Maven Plugin");
@@ -66,7 +67,8 @@ public abstract class AbstractMainMojo extends AbstractMojo {
     }
 
     /**
-    * Return the project dependencies (minus ignored scopes)
+    * Gets the project dependencies (except ignored scopes)
+    * @return the project dependencies as List of Artifact
     */
     protected List<Artifact> getProjectDependencies() {
         return ProjectsUtils.getFilteredDependencies(new ArrayList<Artifact>(project.getArtifacts()),

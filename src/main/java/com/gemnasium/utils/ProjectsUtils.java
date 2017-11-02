@@ -58,36 +58,33 @@ public class ProjectsUtils {
     }
 
     private static ObjectNode depToJsonNode(ObjectMapper mapper, Artifact art) {
-        String parents = getDependencyParents(new ArrayList<String>(art.getDependencyTrail()));
+        List<String> parents = getDependencyParents(new ArrayList<String>(art.getDependencyTrail()));
 
         ObjectNode jsonNode = mapper.createObjectNode();
         jsonNode.put("name", art.getGroupId() + ":" + art.getArtifactId());
         jsonNode.put("version", art.getVersion());
         jsonNode.put("scope", art.getScope());
         jsonNode.put("transitive", !parents.isEmpty());
-        jsonNode.put("parents", parents);
+        jsonNode.set("parents", mapper.valueToTree(parents));
 
         return jsonNode;
     }
 
-    private static String getDependencyParents(List<String> trail) {
-        List<String> ancestors;
+    private static List<String> getDependencyParents(List<String> trail){
+        List<String> parents = new ArrayList<String>();
         try {
-            // Drop the project artifact (first element of the dependencyTrail)
-            // Drop the current dependency artifact (last element of the dependencyTrail)
-            // trail.remove(0);
-            // trail.remove(trail.size() - 1);
-            ancestors = trail.subList(1, trail.size() - 1);
+            // Remove the first and the last elements of the dependency trail which are
+            // respectively the project artifact and the current dependency artifact
+            trail = trail.subList(1, trail.size() - 1);
         } catch (IndexOutOfBoundsException e) {
-            return "";
+            return parents;
         }
 
-        List<String> parents = new ArrayList<String>();
-        for (String gav : ancestors) {
+        for (String gav : trail) {
             String[] items = gav.split(":");
             parents.add(items[0] + ":" + items[1]);
         }
-        return String.join(", ", parents);
+        return parents;
     }
 
 }
