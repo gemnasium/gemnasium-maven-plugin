@@ -2,25 +2,23 @@ package com.gemnasium;
 
 import com.gemnasium.utils.AuthUtils;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.net.ssl.HttpsURLConnection;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- * Goal which shows project info
+ * Shows project info
  */
-@Mojo( name = "show-project", defaultPhase = LifecyclePhase.PROCESS_SOURCES )
-public class ShowProjectMojo extends MainMojo{
+@Mojo(name = "show-project", defaultPhase = LifecyclePhase.PROCESS_SOURCES)
+public class ShowProjectMojo extends AbstractMainMojo {
 
     public void execute() throws MojoExecutionException {
         super.execute();
@@ -36,8 +34,9 @@ public class ShowProjectMojo extends MainMojo{
         URL url;
         try {
             url = new URL(config.getApiBaseUrl() + "/projects/" + projectSlug);
-        } catch(MalformedURLException e) {
-            throw new MojoExecutionException("create-project failed, invalid parameters apiBaseUrl or teamSlug, can't forge URL");
+        } catch (MalformedURLException e) {
+            throw new MojoExecutionException(
+                    "create-project failed, invalid parameters baseUrl or teamSlug, can't forge URL");
         }
 
         HttpsURLConnection conn;
@@ -45,7 +44,7 @@ public class ShowProjectMojo extends MainMojo{
             conn = (HttpsURLConnection) url.openConnection();
 
             conn.setRequestProperty("Authorization", "Basic " + AuthUtils.getEncodedBasicToken(config.getApiKey()));
-        } catch(IOException e ) {
+        } catch (IOException e) {
             throw new MojoExecutionException("show-project failed, can't connect to Gemnasium API.", e);
         }
 
@@ -65,17 +64,17 @@ public class ShowProjectMojo extends MainMojo{
                 throw new MojoExecutionException("show-project failed, API Error");
             }
         }
-        
-        // Parses JSON responsse to find project attributes
+
+        // Parses JSON response to find project attributes
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node;
         try {
             node = mapper.readTree(is);
-            getLog().info( "Project Info for: " + node.get("name").asText() );
-            getLog().info( "" );
-            getLog().info( "\t slug: " + node.get("slug").asText() );
-            getLog().info( "\t branch: " + node.get("branch").asText() );
-            getLog().info( "\t color: " + node.get("color").asText() ); 
+            getLog().info("Project Info for: " + node.get("name").asText());
+            getLog().info("");
+            getLog().info("\t slug: " + node.get("slug").asText());
+            getLog().info("\t branch: " + node.get("branch").asText());
+            getLog().info("\t color: " + node.get("color").asText());
         } catch (Exception e) {
             throw new MojoExecutionException("show-project failed, malformed API response");
         }

@@ -1,9 +1,9 @@
 package com.gemnasium;
 
-import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
@@ -14,16 +14,18 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public class Config {
 
-    private static final String DEFAULT_API_BASE_URL = "https://gemnasium.com/api/v2";
+    private static final String DEFAULT_BASE_URL = "https://gemnasium.com";
+    private static final String API_PREFIX = "/api/v2";
     private static final String GEMNASIUM_PROPERTIES_FILE_PATH = "/src/main/resources/gemnasium.properties";
-    
+
     private File baseDir;
 
-    private String apiBaseUrl;
     private String apiKey;
+    private String baseUrl;
     private String projectBranch;
     private String projectSlug;
     private String projectRevision;
+    private String ignoredScopes;
 
     /**
      * Initializes a the plugin configuration with the following ascending priority:
@@ -32,45 +34,33 @@ public class Config {
      *  - env variables
      */
 
-    public Config(File baseDir, String apiBaseUrl, String apiKey, String projectBranch, String projectSlug, String projectRevision) throws MojoExecutionException {
+    public Config(File baseDir, String baseUrl, String apiKey, String projectBranch, String projectSlug,
+            String projectRevision, String ignoredScopes) throws MojoExecutionException {
         this.baseDir = baseDir;
         Properties configProperties;
         try {
             configProperties = loadConfigProperties();
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new MojoExecutionException("Can't load configuration file.", e);
         }
 
-        this.apiBaseUrl = getFirstNotEmpty(
-            System.getenv().get("GEMNASIUM_API_BASE_URL"),
-            apiBaseUrl,
-            configProperties.getProperty("apiBaseUrl")
-        );
-        // Set default apiBaseUrl if none provided
-        if (this.apiBaseUrl == null || this.apiBaseUrl.isEmpty()) {
-            this.apiBaseUrl = DEFAULT_API_BASE_URL;
+        this.baseUrl = getFirstNotEmpty(System.getenv().get("GEMNASIUM_BASE_URL"), baseUrl,
+                configProperties.getProperty("baseUrl"));
+        // Set default baseUrl if none provided
+        if (this.baseUrl == null || this.baseUrl.isEmpty()) {
+            this.baseUrl = DEFAULT_BASE_URL;
         }
 
-        this.apiKey = getFirstNotEmpty(
-            System.getenv().get("GEMNASIUM_API_KEY"),
-            apiKey,
-            configProperties.getProperty("apiKey")
-        );
-        this.projectBranch = getFirstNotEmpty(
-            System.getenv().get("GEMNASIUM_PROJECT_BRANCH"),
-            projectBranch,
-            configProperties.getProperty("projectBranch")
-        );
-        this.projectSlug = getFirstNotEmpty(
-            System.getenv().get("GEMNASIUM_PROJECT_SLUG"),
-            projectSlug,
-            configProperties.getProperty("projectSlug")
-        );
-        this.projectRevision = getFirstNotEmpty(
-            System.getenv().get("GEMNASIUM_PROJECT_REVISION"),
-            projectRevision,
-            configProperties.getProperty("projectRevision")
-        );
+        this.apiKey = getFirstNotEmpty(System.getenv().get("GEMNASIUM_API_KEY"), apiKey,
+                configProperties.getProperty("apiKey"));
+        this.projectBranch = getFirstNotEmpty(System.getenv().get("GEMNASIUM_PROJECT_BRANCH"), projectBranch,
+                configProperties.getProperty("projectBranch"));
+        this.projectSlug = getFirstNotEmpty(System.getenv().get("GEMNASIUM_PROJECT_SLUG"), projectSlug,
+                configProperties.getProperty("projectSlug"));
+        this.projectRevision = getFirstNotEmpty(System.getenv().get("GEMNASIUM_PROJECT_REVISION"), projectRevision,
+                configProperties.getProperty("projectRevision"));
+        this.ignoredScopes = getFirstNotEmpty(System.getenv().get("GEMNASIUM_IGNORED_SCOPES"), ignoredScopes,
+                configProperties.getProperty("ignoredScopes"));
     }
 
     private String getFirstNotEmpty(String envVarConfig, String pluginConfig, String propertyConfig) {
@@ -91,7 +81,7 @@ public class Config {
         if (!file.exists()) {
             return properties;
         }
-        InputStream is = new FileInputStream( file );
+        InputStream is = new FileInputStream(file);
         properties.load(is);
         return properties;
     }
@@ -103,32 +93,50 @@ public class Config {
         newProperties.putAll(updatedProperties);
         storeConfigProperties(newProperties);
     }
- 
+
     public String toString() {
-        return "apiBaseUrl:" + apiBaseUrl + "\n" +
-               "apiKey:" + apiKey + "\n" +
-               "projectBranch:" + projectBranch + "\n" +
-               "projectSlug:" + projectSlug + "\n" +
-               "projectRevision:" + projectRevision + "\n";
+        return "baseUrl:" + baseUrl + "\n" + "apiKey:" + apiKey + "\n" + "projectBranch:" + projectBranch + "\n"
+                + "projectSlug:" + projectSlug + "\n" + "projectRevision:" + projectRevision + "\n" + "ignoredScopes:"
+                + ignoredScopes + "\n";
     }
 
     private void storeConfigProperties(Properties properties) throws Exception {
         File file = new File(baseDir + GEMNASIUM_PROPERTIES_FILE_PATH);
-        OutputStream os = new FileOutputStream( file );
+        OutputStream os = new FileOutputStream(file);
         properties.store(os, "Gemnasium configuration");
     }
 
-    // Getters and setters
+    /**
+    * @return the API base url
+    */
     public String getApiBaseUrl() {
-        return apiBaseUrl;
+        return baseUrl + API_PREFIX;
     }
-    public void setApiBaseUrl(String apiBaseUrl) {
-        this.apiBaseUrl = apiBaseUrl;
+
+    /**
+    * @return the UI url
+    */
+    public String getUIBaseUrl() {
+        // TODO: hardcoded value for Beta
+        if (baseUrl == DEFAULT_BASE_URL) {
+            return "https://beta.gemnasium.com";
+        }
+        return baseUrl;
+    }
+
+    // Getters and setters
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setbaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public String getApiKey() {
         return apiKey;
     }
+
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
@@ -136,6 +144,7 @@ public class Config {
     public String getProjectBranch() {
         return projectBranch;
     }
+
     public void setProjectBranch(String projectBranch) {
         this.projectBranch = projectBranch;
     }
@@ -143,6 +152,7 @@ public class Config {
     public String getProjectSlug() {
         return projectSlug;
     }
+
     public void setProjectSlug(String projectSlug) {
         this.projectSlug = projectSlug;
     }
@@ -150,7 +160,17 @@ public class Config {
     public String getProjectRevision() {
         return projectRevision;
     }
+
     public void setProjectRevision(String projectRevision) {
         this.projectRevision = projectRevision;
     }
+
+    public String getIgnoredScopes() {
+        return ignoredScopes;
+    }
+
+    public void setIgnoredScopes(String ignoredScopes) {
+        this.ignoredScopes = ignoredScopes;
+    }
+
 }

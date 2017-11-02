@@ -1,9 +1,9 @@
 package com.gemnasium.utils;
 
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Utils for authentication.
