@@ -2,9 +2,11 @@
 
 The Gemnasium maven plugin helps you manage your project dependencies with Gemnasium. Gemnasium keeps track of project dependencies and send notifications when new versions are released or security advisories are published.
 
-# DRAFT NOTICE
+## **Beta notice**
 
-This plugin is not yet available. Coming soon.
+Maven support is only available on beta.gemnasium.com for now.
+
+You can request invite to the Beta program at support@gemnasium.com.
 
 ## How to install it?
 
