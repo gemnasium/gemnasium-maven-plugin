@@ -36,7 +36,8 @@ public class SendDependenciesMojo extends AbstractMainMojo {
 
         String content = new String();
         try {
-            ArrayNode jsonDependencies = ProjectsUtils.getJsonDependencies(getProjectDependencies());
+            ArrayNode jsonDependencies = ProjectsUtils.getJsonDependencies(getAllDependencies(),
+                    getDirectDependencies());
             content = ProjectsUtils.getDependencyFileContent(jsonDependencies);
         } catch (JsonProcessingException e) {
             throw new MojoExecutionException("send-dependencies failed, can't get project dependencies", e);

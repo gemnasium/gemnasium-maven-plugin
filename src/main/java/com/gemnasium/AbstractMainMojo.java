@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -54,8 +55,7 @@ public abstract class AbstractMainMojo extends AbstractMojo {
      * @throws MojoExecutionException if config can't be loaded
      */
     protected void loadConfig() throws MojoExecutionException {
-        this.config = new Config(baseDir, baseUrl, apiKey, projectBranch, projectSlug, projectRevision,
-                ignoredScopes);
+        this.config = new Config(baseDir, baseUrl, apiKey, projectBranch, projectSlug, projectRevision, ignoredScopes);
     }
 
     /**
@@ -67,11 +67,20 @@ public abstract class AbstractMainMojo extends AbstractMojo {
     }
 
     /**
-    * Gets the project dependencies (except ignored scopes)
+    * Gets all project dependencies, direct and transitives,
+    * but exclude those matching ignored scopes.
     * @return the project dependencies as List of Artifact
     */
-    protected List<Artifact> getProjectDependencies() {
+    protected List<Artifact> getAllDependencies() {
         return ProjectsUtils.getFilteredDependencies(new ArrayList<Artifact>(project.getArtifacts()),
                 config.getIgnoredScopes());
+    }
+
+    /**
+    * Gets the project direct dependencies
+    * @return the project dependencies as List of Dependency
+    */
+    protected List<Dependency> getDirectDependencies() {
+        return new ArrayList<Dependency>(project.getDependencies());
     }
 }

@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 
 /**
  * Utils for projects.
@@ -48,11 +50,24 @@ public class ProjectsUtils {
         return filteredDependencies;
     }
 
-    public static ArrayNode getJsonDependencies(List<Artifact> artifacts) {
+    public static ArrayNode getJsonDependencies(List<Artifact> artifacts, List<Dependency> directDependencies) {
+        HashMap<String, String> requirements = new HashMap<String, String>(directDependencies.size());
+        for (Dependency dep : directDependencies) {
+            requirements.put(dep.getGroupId() + ":" + dep.getArtifactId(), dep.getVersion());
+        }
+
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode arrayNode = mapper.createArrayNode();
         for (Artifact art : artifacts) {
-            arrayNode.add(depToJsonNode(mapper, art));
+            ObjectNode artNode = depToJsonNode(mapper, art);
+            String requirement;
+            requirement = requirements.get(art.getGroupId() + ":" + art.getArtifactId());
+            // Temporary workaround for transitive dependencies
+            if (requirement == null){
+                requirement = art.getVersion();
+            }
+            artNode.put("requirement", requirement);
+            arrayNode.add(artNode);
         }
         return arrayNode;
     }
@@ -61,16 +76,20 @@ public class ProjectsUtils {
         List<String> parents = getDependencyParents(new ArrayList<String>(art.getDependencyTrail()));
 
         ObjectNode jsonNode = mapper.createObjectNode();
-        jsonNode.put("name", art.getGroupId() + ":" + art.getArtifactId());
+        jsonNode.put("groupId", art.getGroupId());
+        jsonNode.put("artifactId", art.getArtifactId());
+        jsonNode.put("type", art.getType());
+        jsonNode.put("classifier", art.getClassifier());
         jsonNode.put("version", art.getVersion());
         jsonNode.put("scope", art.getScope());
         jsonNode.put("transitive", !parents.isEmpty());
         jsonNode.set("parents", mapper.valueToTree(parents));
+        jsonNode.put("optional", art.isOptional());
 
         return jsonNode;
     }
 
-    private static List<String> getDependencyParents(List<String> trail){
+    private static List<String> getDependencyParents(List<String> trail) {
         List<String> parents = new ArrayList<String>();
         try {
             // Remove the first and the last elements of the dependency trail which are
