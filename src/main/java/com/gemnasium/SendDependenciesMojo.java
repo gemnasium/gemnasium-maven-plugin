@@ -45,7 +45,7 @@ public class SendDependenciesMojo extends AbstractMainMojo {
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode arrayNode = mapper.createArrayNode();
         ObjectNode jsonNode = mapper.createObjectNode();
-        jsonNode.put("name", DEPENDENCY_FILE_NAME);
+        jsonNode.put("path", DEPENDENCY_FILE_NAME);
         jsonNode.put("content", content);
         arrayNode.add(jsonNode);
         String requestBody = arrayNode.toString();
