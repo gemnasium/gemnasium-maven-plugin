@@ -18,7 +18,7 @@ The Gemnasium Maven Plugin is published on the Maven Central Reposoritory so you
     <plugin>
       <groupId>com.gemnasium</groupId>
       <artifactId>gemnasium-maven-plugin</artifactId>
-      <version>1.0</version>
+      <version>0.2.0</version>
     </plugin>
   </plugins>
 </build>
@@ -30,7 +30,7 @@ The Gemnasium Maven Plugin is compatible with Gemnasium API V2, which is only av
 
 ## How to use it?
 
-Before using the plugin, you'll need to configure at least your Gemnasium API KEY (see [Configuration](#configuration) section below). 
+Before using the plugin, you'll need to configure at least your Gemnasium API KEY (see [Configuration](#configuration) section below).
 
 ### Ping
 
@@ -94,7 +94,7 @@ The configuration can also be provided directly within `pom.xml`.
     <plugin>
       <groupId>com.gemnasium</groupId>
       <artifactId>gemnasium-maven-plugin</artifactId>
-      <version>1.0</version>
+      <version>0.2.0</version>
       <configuration>
         <apiKey>secret</apiKey>
         <projectSlug>foo/bar/baz</projectSlug>
