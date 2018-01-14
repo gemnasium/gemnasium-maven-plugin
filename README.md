@@ -10,7 +10,7 @@ You can request invite to the Beta program at support@gemnasium.com.
 
 ## How to install it?
 
-The Gemnasium Maven Plugin is published on the Maven Central Reposoritory so you just need to add the plugin to your project's `pom.xml`:
+The Gemnasium Maven Plugin is published on the Maven Central Repository so you just need to add the plugin to your project's `pom.xml`:
 
 ```xml
 <build>
