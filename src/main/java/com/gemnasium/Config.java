@@ -132,6 +132,10 @@ public class Config {
     }
 
     // Getters and setters
+    public File getBaseDir() {
+        return baseDir;
+    }
+
     public String getBaseUrl() {
         return baseUrl;
     }

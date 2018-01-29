@@ -68,6 +68,15 @@ To show your project details you need to run:
 
     mvn gemnasium:show-project
 
+### Dump your project's dependencies to a json file
+
+You can write the list your project dependencies to a json file without any setup:
+
+    mvn gemnasium:dump-dependencies
+
+You can ignore some dependencies with the `ignoredScope` option (see [Configuration](#configuration) section below).
+
+    mvn gemnasium:dump-dependencies -DignoredScopes=test
 
 ## Configuration
 
