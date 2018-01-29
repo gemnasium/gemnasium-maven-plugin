@@ -120,7 +120,7 @@ public class CreateProjectMojo extends AbstractMainMojo {
         try {
             config.updateConfigProperties(properties);
         } catch (Exception e) {
-            throw new MojoExecutionException(
+            getLog().warn(
                     "Project was created but the configuration can't be stored in the properties file. Your project slug is: "
                             + slug,
                     e);
