@@ -18,7 +18,7 @@ The Gemnasium Maven Plugin is published on the Maven Central Repository so you j
     <plugin>
       <groupId>com.gemnasium</groupId>
       <artifactId>gemnasium-maven-plugin</artifactId>
-      <version>0.2.0</version>
+      <version>0.3.0</version>
     </plugin>
   </plugins>
 </build>
@@ -103,7 +103,7 @@ The configuration can also be provided directly within `pom.xml`.
     <plugin>
       <groupId>com.gemnasium</groupId>
       <artifactId>gemnasium-maven-plugin</artifactId>
-      <version>0.2.0</version>
+      <version>0.3.0</version>
       <configuration>
         <apiKey>secret</apiKey>
         <projectSlug>foo/bar/baz</projectSlug>
